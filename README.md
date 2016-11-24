@@ -12,6 +12,7 @@ This script *does* support:
  * No database needed
 
 This script *does not* support:
+
  * Other responses than JSON
  * Upload from the webbrowser
  * Users, authentication, etc.
