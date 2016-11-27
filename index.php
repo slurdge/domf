@@ -58,7 +58,7 @@ function uploadfile($file, $config) {
         case UPLOAD_ERR_FORM_SIZE:
             throw new RuntimeException('Exceeded filesize limit.');
         default:
-            throw new RuntimeException('Unknown errors.');
+            throw new RuntimeException('Unknown error.');
     }
 
     // You should also check filesize here.
