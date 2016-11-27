@@ -1,9 +1,15 @@
 <?php
-require "config.php";
+if (!isset($config)) {
+    require 'config.php';
+}
+
+if (!isset($config)) {
+    die();
+}
 
 header('Content-Type:  application/json; charset=utf-8');
 
-$upload_path = realpath($upload_path).DIRECTORY_SEPARATOR;
+$upload_path = realpath($config['upload_path']).DIRECTORY_SEPARATOR;
 chdir($upload_path);
 
 $answer = [];
@@ -20,12 +26,18 @@ function diverse_array($vector) {
 // Creates a short link by creating an actual symlink
 function get_short_link($sha1, $ext) {
     $link_size = 6;
-    $full = $sha1.".".$ext;
-    $short = substr($sha1, 0, $link_size).".".$ext;
-    $link = readlink($short);
+    $full = $sha1.'.'.$ext;
+    $short = substr($sha1, 0, $link_size).'.'.$ext;
+    if (file_exists($short)) {
+        $link = readlink($short);
+    }
+    else {
+        $link = false;
+    }
+
     while ((false != $link) && (basename($link) != $full)) {
         $link_size += 1;
-        $short = substr($sha1, 0, $link_size).".".$ext;
+        $short = substr($sha1, 0, $link_size).'.'.$ext;
         $link = readlink($short);
     }
     if ($link == false) {
@@ -35,7 +47,7 @@ function get_short_link($sha1, $ext) {
 }
 
 // Upload one file
-function uploadfile($file, $allowed_exts, $max_upload_size, $base_url, $shorten_url) {
+function uploadfile($file, $config) {
     // Check $file['error'] value.
     switch ($file['error']) {
         case UPLOAD_ERR_OK:
@@ -50,7 +62,7 @@ function uploadfile($file, $allowed_exts, $max_upload_size, $base_url, $shorten_
     }
 
     // You should also check filesize here.
-    if ($file['size'] > $max_upload_size) {
+    if ($file['size'] > $config['max_upload_size']) {
         throw new RuntimeException('Exceeded filesize limit.');
     }
 
@@ -59,14 +71,14 @@ function uploadfile($file, $allowed_exts, $max_upload_size, $base_url, $shorten_
     $finfo = new finfo(FILEINFO_MIME_TYPE);
     if (false === $ext = array_search(
         $finfo->file($file['tmp_name']),
-         $allowed_exts,
+        $config['allowed_exts'],
         true
     )) {
         throw new RuntimeException('Invalid file format.');
     }
 
     $sha1 = sha1_file($file['tmp_name']);
-    $finalname = $sha1.".".$ext;
+    $finalname = $sha1.'.'.$ext;
 
     // You should name it uniquely.
     // DO NOT USE $file['name'] WITHOUT ANY VALIDATION !!
@@ -78,11 +90,11 @@ function uploadfile($file, $allowed_exts, $max_upload_size, $base_url, $shorten_
         throw new RuntimeException('Failed to move uploaded file.');
     }
 
-    if ($shorten_url) {
+    if ($config['shorten_url']) {
         $finalname = get_short_link($sha1, $ext);    
     }
     
-    return [ "name"=>$file["name"], "url"=> $base_url.$finalname, "hash"=>$sha1, "size"=>$file["size"] ];
+    return [ 'name'=>$file['name'], 'url'=> $config['base_url'].$finalname, 'hash'=>$sha1, 'size'=>$file['size'] ];
 }
 
 // Upload all files
@@ -98,17 +110,17 @@ try {
     $files = diverse_array($_FILES['files']);
     $rfiles = [];
     foreach($files as $file) {
-        $rfiles[] = uploadfile($file, $allowed_exts, $max_upload_size, $base_url, $shorten_url);
+        $rfiles[] = uploadfile($file, $config);
     }
 
-    $answer["success"] = true;
-    $answer["files"] = $rfiles;
+    $answer['success'] = true;
+    $answer['files'] = $rfiles;
 
 } catch (RuntimeException $e) {
 
-    $answer["success"] = false;
-    $answer["errorcode"] = 400;
-    $answer["description"] = $e->getMessage();
+    $answer['success'] = false;
+    $answer['errorcode'] = 400;
+    $answer['description'] = $e->getMessage();
 }
 
 print(json_encode($answer));
