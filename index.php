@@ -41,7 +41,7 @@ function get_short_link($sha1, $ext) {
         $link = readlink($short);
     }
     if ($link == false) {
-        symlink($full, $short);        
+        symlink($full, $short);
     }
     return $short;
 }
@@ -91,9 +91,9 @@ function uploadfile($file, $config) {
     }
 
     if ($config['shorten_url']) {
-        $finalname = get_short_link($sha1, $ext);    
+        $finalname = get_short_link($sha1, $ext);
     }
-    
+
     return [ 'name'=>$file['name'], 'url'=> $config['base_url'].$finalname, 'hash'=>$sha1, 'size'=>$file['size'] ];
 }
 
