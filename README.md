@@ -23,6 +23,16 @@ Installation
 Just copy the script to some location and edit `config.php` files.
 Variables should be self explained.
 
+If you want, you can also merge `config.php` and `index.php` files by doing so:
+
+```shell
+mv index.php index_.php
+cat config.php index_.php > index.php
+rm config.php index_.php
+```
+
+You can now freely move index.php file.
+
 Securing
 --------
 
@@ -35,7 +45,7 @@ If you want to "secure" your script, you can put it in a random location, such a
 
 You should also use https protocol in order to prevent someone sniffing the URL.
 
-Once you've done that, change the `$upload_path` to some other location.
+Once you've done that, change the `upload_path` to some other location.
 
 Short URLs
 ----------
