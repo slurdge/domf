@@ -28,11 +28,9 @@ function get_short_link($sha1, $ext) {
     $link_size = 6;
     $full = $sha1.'.'.$ext;
     $short = substr($sha1, 0, $link_size).'.'.$ext;
+    $link = false;
     if (file_exists($short)) {
         $link = readlink($short);
-    }
-    else {
-        $link = false;
     }
 
     while ((false != $link) && (basename($link) != $full)) {
