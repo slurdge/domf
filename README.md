@@ -1,6 +1,9 @@
 domf - Dumb pOMF clone
 ======================
 
+[![Code Climate](https://codeclimate.com/github/slurdge/domf/badges/gpa.svg)](https://codeclimate.com/github/slurdge/domf)
+[![Issue Count](https://codeclimate.com/github/slurdge/domf/badges/issue_count.svg)](https://codeclimate.com/github/slurdge/domf)
+
 This script is a one php file (+config) that allows you to upload files to a host with pomf protocol.
 
 This script *does* support:
